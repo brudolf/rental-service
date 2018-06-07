@@ -4,13 +4,15 @@ export default {
   fetchRentals () {
     return Api().get('rental')
   },
-
-  addPost (params) {
-    return Api().post('posts/add', params)
+  addRental (param) {
+    return Api().post('rental', param)
+  },
+  fetchLightShapers () {
+    return Api().get('rental/lightshapers')
   },
 
-  updatePost (params) {
-    return Api().put('posts/' + params.id, params)
+  fetchProducts () {
+    return Api().get('rental/products')
   },
 
   getPost (params) {

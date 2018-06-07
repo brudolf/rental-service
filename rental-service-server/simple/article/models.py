@@ -70,6 +70,7 @@ class Rental(models.Model):
     rent_register = models.CharField('Bérlést felvette', max_length=250)
     rent_start = models.DateField('Bérlés kezdete')
     rent_end = models.DateField('Bérlés vége')
+    returned = models.BooleanField('Visszahozva', default=False)
     #rental_item = models.ManyToManyField(RentalItem)
 
 class RentalItem(models.Model):

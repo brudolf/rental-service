@@ -28,7 +28,7 @@ class RentalInstanceInline(admin.StackedInline):
 
 @admin.register(Rental)
 class RentalAdmin(admin.ModelAdmin):
-    list_display = ('user_name', 'rent_start', 'rent_end', 'rent_register')
+    list_display = ('user_name', 'rent_start', 'rent_end', 'rent_register', 'returned')
     inlines = [RentalInstanceInline]
     class Media:
         js = ('/static/scripts/custom.js', )

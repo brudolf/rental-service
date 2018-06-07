@@ -5,18 +5,51 @@ from django.http import HttpResponse, JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework.renderers import JSONRenderer
 from rest_framework.parsers import JSONParser
-from article.models import Bundle, LightShaper, Rental
-from article.serializers import BundleSerializer, LightShaperSerializer, RentalSerializer
+from article.models import Bundle, LightShaper, Rental, Product
+from article.serializers import BundleSerializer, LightShaperSerializer, RentalSerializer, ProductSerializer
 
 def index(request):
     return HttpResponse('Hello World')
+
+
+@csrf_exempt
+def products_list(request):
+    if request.method == 'GET':
+        product = Product.objects.all()
+        serializer = ProductSerializer(product, many=True)
+        return JsonResponse(serializer.data, safe=False)
+
+    elif request.method == 'POST':
+        data = JSONParser().parse(request)
+        serializer = ProductSerializer(data=data)
+        if serializer.is_valid():
+            serializer.save()
+            return JsonResponse(serializer.data, status=201)
+        return JsonResponse(serializer.errors, status=400)
+
+
+@csrf_exempt
+def lightShaper_list(request):
+    if request.method == 'GET':
+        lightshaper = LightShaper.objects.all()
+        serializer = LightShaperSerializer(lightshaper, many=True)
+        return JsonResponse(serializer.data, safe=False)
+
+    elif request.method == 'POST':
+        data = JSONParser().parse(request)
+        serializer = LightShaperSerializer(data=data)
+        if serializer.is_valid():
+            serializer.save()
+            return JsonResponse(serializer.data, status=201)
+        return JsonResponse(serializer.errors, status=400)
+
+
 
 @csrf_exempt
 def rental_list(request):
 
     if request.method == 'GET':
         rental = Rental.objects.all()
-        #print(rental)
         serializer = RentalSerializer(rental, many=True)
         return JsonResponse(serializer.data, safe=False)
 

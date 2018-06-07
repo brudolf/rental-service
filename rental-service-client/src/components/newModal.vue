@@ -3,10 +3,10 @@
     <h1>Bérlés felvétel</h1>
       <div class="form">
         <div>
-          <input type="text" name="title" placeholder="Név">
+          <input v-model="name" type="text" name="title" placeholder="Név">
         </div>
         <div>
-          <input type="text" name="title" placeholder="Telefonszám">
+          <input v-model="phone" type="text" name="title" placeholder="Telefonszám">
         </div>
         <div>
           <!--<textarea rows="15" cols="15" placeholder="DESCRIPTION"></textarea>-->
@@ -34,19 +34,23 @@
         <div class="row item" v-for="item in items">
           <div class="form-element">
             <div>
-              <multiselect v-model="item.town" :options="productOptions" :searchable="false" :close-on-select="false" :show-labels="false" placeholder="Termék típus"></multiselect>
+              <multiselect v-model="item.type" :options="productOptions" :searchable="false" :close-on-select="true" :show-labels="false" placeholder="Termék típus"></multiselect>
             </div>
             <div>
-              <multiselect v-model="item.zip" :options="options" :multiple="true" :close-on-select="false" :clear-on-select="false" :hide-selected="true" :preserve-search="true" placeholder="Válassz fényformálót" label="name" track-by="name" :preselect-first="false">
+              <multiselect v-show="item.type == 'Fényformáló'" v-model="item.product" :options="lightshapers" :close-on-select="true" :clear-on-select="false" :hide-selected="true" :preserve-search="true" placeholder="Válassz fényformálót" label="name" track-by="name" :preselect-first="false">
+                <template slot="tag" slot-scope="props"><span class="custom__tag"><span>{{ props.option.value }}</span><span class="custom__remove" @click="props.remove(props.option)">❌</span></span></template>
+              </multiselect>
+              <multiselect v-show="item.type == 'Termék'" v-model="item.product" :options="products" :close-on-select="true" :clear-on-select="false" :hide-selected="true" :preserve-search="true" placeholder="Válassz Terméket" label="name" track-by="name" :preselect-first="false">
                 <template slot="tag" slot-scope="props"><span class="custom__tag"><span>{{ props.option.value }}</span><span class="custom__remove" @click="props.remove(props.option)">❌</span></span></template>
               </multiselect>
               <div>
-                <input class="pieces" v-model="item.street" type="text" name="title" placeholder="Darab">
+                <input class="pieces" v-model="item.quantity" type="text" name="title" placeholder="Darab">
               </div>
             </div>
           </div>
         </div>
         <button class="add-row" @click="addItemsRow">+</button>
+        <button class="submitButton" @click="submitForm()" type="submit" name="button">Elküld</button>
       </div>
   </div>
 </template>
@@ -54,24 +58,19 @@
 <script>
 import Multiselect from 'vue-multiselect'
 import { store } from '../store/store'
-// import { mapMutations } from 'vuex'
 
 export default {
   data () {
     return {
+      name: '',
+      phone: '',
       startDate: null,
       endDate: null,
       startTime: null,
       endTime: null,
       items: [],
-      options: [
-        { name: '60x90-es softbox', value: '60x90-es softbox' },
-        { name: '120-as oktobox', value: '120-as oktobox' },
-        { name: '40x180-as softbox', value: '40x180-as softbox' },
-        { name: 'Sinatra', value: 'Ruby' },
-        { name: 'Laravel', value: 'PHP' },
-        { name: 'Phoenix', value: 'Elixir' }
-      ],
+      lightshapers: [],
+      products: [],
       productOptions: ['Termék', 'Szett', 'Fényformáló'],
       configs: {
         basic: {
@@ -97,12 +96,35 @@ export default {
       }
     }
   },
+  computed: {
+    lightShapersWatch () {
+      return store.getters.getLightShapersList
+    },
+    productsWatch () {
+      return store.getters.getProductList
+    }
+  },
+  watch: {
+    lightShapersWatch (newShapers, oldShapers) {
+      this.lightshapers = store.getters.getLightShapersList
+    },
+    productsWatch (newP, oldP) {
+      this.products = store.getters.getProductList
+    }
+  },
   mounted () {
     this.items = store.getters.getItems
   },
   methods: {
     addItemsRow () {
       store.commit('addItemsRow')
+    },
+    submitForm () {
+      console.log(this.name)
+      console.log(this.phone)
+      console.log(this.startDate)
+      console.log(this.endDate)
+      console.log(this.items)
     }
   },
   components: {
@@ -169,7 +191,7 @@ export default {
   font-size: 18px;
 }
 .add-row:hover {
-  background: rgba(0,0,0,0.20)
+  background: rgba(0,0,0,0.20);
 }
 .form input, .form textarea {
   width: 400px;
@@ -192,4 +214,18 @@ export default {
   border: none;
   cursor: pointer;
 }
+.submitButton {
+  cursor: pointer;
+  color: #000;
+  display: block;
+  margin-top: 8px;
+  padding: 4px 10px;
+  background: rgba(0,0,0,0.12);
+  border: none;
+  border-radius: 4px;
+}
+.submitButton:hover {
+  background: rgba(0,0,0,0.20)
+}
+
 </style>
