@@ -13,7 +13,8 @@ export const store = new Vuex.Store({
       quantity: ''
     }],
     lightshapers: [],
-    products: []
+    products: [],
+    bundles: []
   },
   plugins: [plugin],
   getters: {
@@ -27,8 +28,10 @@ export const store = new Vuex.Store({
       let s = []
       state.lightshapers.forEach(item =>
         s.push({
-          'name': item.lightshaper_name,
-          'value': item.lightshaper_name
+          'id': item.id,
+          'name': item.name,
+          'value': item.price,
+          'quantity': item.quantity
         }))
       return s
     },
@@ -36,11 +39,26 @@ export const store = new Vuex.Store({
       let p = []
       state.products.forEach(item =>
         p.push({
-          'name': item.product_name + ' (' + item.product_quantity + ')',
-          'value': item.product_name
+          'id': item.id,
+          'name': item.name,
+          'price': item.price,
+          'quantity': item.quantity,
+          'type': item.type
         })
       )
       return p
+    },
+    getBundles (state) {
+      let b = []
+      state.bundles.forEach(item =>
+        b.push({
+          'id': item.id,
+          'name': item.name,
+          'price': item.price,
+          'items': item.items
+        })
+      )
+      return b
     }
   },
   mutations: {
@@ -49,6 +67,9 @@ export const store = new Vuex.Store({
     },
     setLightShapers (state, val) {
       state.lightshapers = val
+    },
+    setBundles (state, val) {
+      state.bundles = val
     },
     setProducts (state, val) {
       state.products = val

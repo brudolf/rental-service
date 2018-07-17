@@ -22,6 +22,9 @@ export default function WebSocketPlugin (socket) {
     RentalService.fetchLightShapers().then(result => {
       store.commit('setLightShapers', result.data)
     })
+    RentalService.fetchBundles().then(result => {
+      store.commit('setBundles', result.data)
+    })
     RentalService.fetchProducts().then(result => {
       store.commit('setProducts', result.data)
     })

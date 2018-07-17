@@ -43,6 +43,9 @@
               <multiselect v-show="item.type == 'Termék'" v-model="item.product" :options="products" :close-on-select="true" :clear-on-select="false" :hide-selected="true" :preserve-search="true" placeholder="Válassz Terméket" label="name" track-by="name" :preselect-first="false">
                 <template slot="tag" slot-scope="props"><span class="custom__tag"><span>{{ props.option.value }}</span><span class="custom__remove" @click="props.remove(props.option)">❌</span></span></template>
               </multiselect>
+              <multiselect v-show="item.type == 'Szett'" v-model="item.bundle" :options="bundles" :close-on-select="true" :clear-on-select="false" :hide-selected="true" :preserve-search="true" placeholder="Válassz Szettet" label="name" track-by="name" :preselect-first="false">
+                <template slot="tag" slot-scope="props"><span class="custom__tag"><span>{{ props.option.value }}</span><span class="custom__remove" @click="props.remove(props.option)">❌</span></span></template>
+              </multiselect>
               <div>
                 <input class="pieces" v-model="item.quantity" type="text" name="title" placeholder="Darab">
               </div>
@@ -58,6 +61,7 @@
 <script>
 import Multiselect from 'vue-multiselect'
 import { store } from '../store/store'
+import RentalService from '../services/RentalService'
 
 export default {
   data () {
@@ -71,6 +75,7 @@ export default {
       items: [],
       lightshapers: [],
       products: [],
+      bundles: [],
       productOptions: ['Termék', 'Szett', 'Fényformáló'],
       configs: {
         basic: {
@@ -102,6 +107,9 @@ export default {
     },
     productsWatch () {
       return store.getters.getProductList
+    },
+    bundlesWatch () {
+      return store.getters.getBundles
     }
   },
   watch: {
@@ -110,6 +118,9 @@ export default {
     },
     productsWatch (newP, oldP) {
       this.products = store.getters.getProductList
+    },
+    bundlesWatch (newB, oldB) {
+      this.bundles = store.getters.getBundles
     }
   },
   mounted () {
@@ -120,11 +131,35 @@ export default {
       store.commit('addItemsRow')
     },
     submitForm () {
-      console.log(this.name)
-      console.log(this.phone)
-      console.log(this.startDate)
-      console.log(this.endDate)
-      console.log(this.items)
+      let arr = []
+      for (var i = 0; i < this.items.length; i++) {
+        if (this.items[i].bundle) {
+          arr.push({
+            'bundle_id': this.items[i].bundle.id,
+            'type': '3',
+            'lightshaper1': { 'id': '8' },
+            'lightshaper2': { 'id': '8' },
+            'quantity': this.items[i].quantity
+          })
+        } else if (this.items[i].product !== '') {
+          arr.push({
+            'product': { 'id': this.items[i].product.id, 'quantity': this.items[i].quantity }
+          })
+        }
+      }
+
+      let data = {
+        'user_name': this.name,
+        'rent_start': this.startDate,
+        'rent_end': this.endDate,
+        'rent_register': 'Kati',
+        'user_phone': this.phone,
+        'items': arr
+      }
+      RentalService.addRental(data).then(result => {
+        // store.commit('setLightShapers', result.data)
+        console.log(result)
+      })
     }
   },
   components: {

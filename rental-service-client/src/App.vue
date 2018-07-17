@@ -37,7 +37,7 @@
       eventClick (event, jsEvent, pos) {
         this.showMore = true
         this.eventDetails = event
-        console.log(this.eventDetails)
+        // console.log(this.eventDetails)
       },
       openAddForm () {
         this.isModalOpen = !this.isModalOpen
