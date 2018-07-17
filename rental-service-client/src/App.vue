@@ -23,6 +23,12 @@
         eventDetails: []
       }
     },
+    created () {
+      this.$on('refresh', () => {
+        console.log('jozi')
+        this.fcEvents = store.getters.getEvents
+      })
+    },
     computed: {
       eventsWatch () {
         return store.getters.getEvents

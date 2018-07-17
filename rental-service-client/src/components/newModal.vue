@@ -156,9 +156,12 @@ export default {
         'user_phone': this.phone,
         'items': arr
       }
+      // console.log(data.rent_end)
       RentalService.addRental(data).then(result => {
         // store.commit('setLightShapers', result.data)
-        console.log(result)
+        if (result.status === 200) {
+          this.$parent.$emit('refresh')
+        }
       })
     }
   },
