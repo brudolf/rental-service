@@ -54,6 +54,8 @@ export const store = new Vuex.Store({
         b.push({
           'id': item.id,
           'name': item.name,
+          'body': item.body,
+          'add_light': item.add_light,
           'price': item.price,
           'items': item.items
         })
@@ -73,6 +75,16 @@ export const store = new Vuex.Store({
     },
     setProducts (state, val) {
       state.products = val
+    },
+    setBackToDefault (state) {
+      state.items = [{
+        type: '',
+        product: '',
+        quantity: ''
+      }]
+    },
+    refresh (state, val) {
+      state.events = val
     },
     addItemsRow (state) {
       state.items.push({

@@ -24,9 +24,8 @@
       }
     },
     created () {
-      this.$on('refresh', () => {
-        console.log('jozi')
-        this.fcEvents = store.getters.getEvents
+      this.$on('close', () => {
+        this.openAddForm()
       })
     },
     computed: {
@@ -43,7 +42,7 @@
       eventClick (event, jsEvent, pos) {
         this.showMore = true
         this.eventDetails = event
-        // console.log(this.eventDetails)
+        console.log(this.eventDetails)
       },
       openAddForm () {
         this.isModalOpen = !this.isModalOpen

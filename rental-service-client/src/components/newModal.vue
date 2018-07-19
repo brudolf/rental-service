@@ -1,5 +1,6 @@
 <template>
   <div class="modall">
+    <div class="close" @click="$parent.$emit('close')"></div>
     <h1>Bérlés felvétel</h1>
       <div class="form">
         <div>
@@ -46,6 +47,47 @@
               <multiselect v-show="item.type == 'Szett'" v-model="item.bundle" :options="bundles" :close-on-select="true" :clear-on-select="false" :hide-selected="true" :preserve-search="true" placeholder="Válassz Szettet" label="name" track-by="name" :preselect-first="false">
                 <template slot="tag" slot-scope="props"><span class="custom__tag"><span>{{ props.option.value }}</span><span class="custom__remove" @click="props.remove(props.option)">❌</span></span></template>
               </multiselect>
+              <div v-if="item.bundle" v-show="item.type == 'Szett'" class="bundle_wrap">
+                <div style="display: flex;justify-content: center">
+                <table class="bundle_table">
+                  <h6 class="bundle_title">Szett tartalma</h6>
+                  <tr v-for="m in item.bundle.items" >
+                    <td>{{ m.name }}</td>
+                    <td>{{ m.quantity }} db</td>
+                  </tr>
+                </table>
+                </div>
+                <div v-show="item.type == 'Szett'&&item.bundle.add_light">
+                  <h6 class="bundle_title">+ fényformáló</h6>
+                  <multiselect
+                    v-model="item.bundle.lightshaper1"
+                    :options="lightshapers"
+                    :close-on-select="true"
+                    :clear-on-select="false"
+                    :hide-selected="true"
+                    :preserve-search="true"
+                    placeholder="Fényformáló 1"
+                    label="name" track-by="name"
+                    :preselect-first="false">
+                    <template slot="tag" slot-scope="props"><span class="custom__tag"><span>{{ props.option.value }}</span><span class="custom__remove" @click="props.remove(props.option)">❌</span></span></template>
+                  </multiselect>
+                </div>
+                <div v-show="item.type == 'Szett'&&item.bundle.add_light">
+                  <h6 class="bundle_title">+ fényformáló</h6>
+                  <multiselect
+                    v-model="item.bundle.lightshaper2"
+                    :options="lightshapers"
+                    :close-on-select="true"
+                    :clear-on-select="false"
+                    :hide-selected="true"
+                    :preserve-search="true"
+                    placeholder="Fényformáló 2"
+                    label="name" track-by="name"
+                    :preselect-first="false">
+                    <template slot="tag" slot-scope="props"><span class="custom__tag"><span>{{ props.option.value }}</span><span class="custom__remove" @click="props.remove(props.option)">❌</span></span></template>
+                  </multiselect>
+                </div>
+              </div>
               <div>
                 <input class="pieces" v-model="item.quantity" type="text" name="title" placeholder="Darab">
               </div>
@@ -110,6 +152,9 @@ export default {
     },
     bundlesWatch () {
       return store.getters.getBundles
+    },
+    itemsWatch () {
+      return store.getters.getItems
     }
   },
   watch: {
@@ -121,6 +166,9 @@ export default {
     },
     bundlesWatch (newB, oldB) {
       this.bundles = store.getters.getBundles
+    },
+    itemsWatch (n, b) {
+      this.items = store.getters.getItems
     }
   },
   mounted () {
@@ -137,17 +185,18 @@ export default {
           arr.push({
             'bundle_id': this.items[i].bundle.id,
             'type': '3',
-            'lightshaper1': { 'id': '8' },
-            'lightshaper2': { 'id': '8' },
+            'lightshaper1': { 'id': this.items[i].bundle.lightshaper1 ? this.items[i].bundle.lightshaper1.id : null },
+            'lightshaper2': { 'id': this.items[i].bundle.lightshaper2 ? this.items[i].bundle.lightshaper2.id : null },
             'quantity': this.items[i].quantity
           })
-        } else if (this.items[i].product !== '') {
+        }
+        if (this.items[i].product !== '') {
           arr.push({
             'product': { 'id': this.items[i].product.id, 'quantity': this.items[i].quantity }
           })
         }
       }
-
+      // console.log(arr)
       let data = {
         'user_name': this.name,
         'rent_start': this.startDate,
@@ -156,11 +205,17 @@ export default {
         'user_phone': this.phone,
         'items': arr
       }
-      // console.log(data.rent_end)
       RentalService.addRental(data).then(result => {
-        // store.commit('setLightShapers', result.data)
         if (result.status === 200) {
-          this.$parent.$emit('refresh')
+          this.name = ''
+          this.phone = ''
+          this.startDate = ''
+          this.startTime = ''
+          this.endDate = ''
+          this.endTime = ''
+          this.$parent.$emit('close')
+          store.commit('setBackToDefault')
+          store.commit('refresh')
         }
       })
     }
@@ -170,100 +225,147 @@ export default {
   }
 }
 </script>
+
 <style src="vue-multiselect/dist/vue-multiselect.min.css"></style>
 <style type="text/css">
-
-.modall {
-  border-radius: 3px;
-  padding: 20px;
-  position: absolute;
-  z-index: 3000;
-  background: #fff;
-  margin-left: 20px;
-  -webkit-box-shadow: 0px 0px 6px 0px rgba(0,0,0,0.75);
-  -moz-box-shadow: 0px 0px 6px 0px rgba(0,0,0,0.75);
-  box-shadow: 0px 0px 6px 0px rgba(0,0,0,0.75);
-}
-
-.row.item {
-  border: 1px solid rgba(0,0,0,0.12);
-  border-radius: 5px;
-  background: rgba(0,0,0,0.02);
-  -webkit-box-shadow: inset 0px 0px 5px 0px rgba(0,0,0,0.12);
-  -moz-box-shadow: inset 0px 0px 5px 0px rgba(0,0,0,0.12);
-  box-shadow: inset 0px 0px 5px 0px rgba(0,0,0,0.12);
-}
-
-.multiselect__tags {
-  border: none !important;
-  background: none;
-}
-.multiselect__single {
-  background: none;
-}
-.pieces {
-  background: none;
-  border: none;
-  border: none !important;
-  font-size: 15px !important;
-  padding-left: 14px !important;
-}
-.custom__tag {
-  padding: 5px;
-  background: rgba(0,0,0,0.12);
-  border-radius: 5px;
-  margin: 2px;
-}
-.custom__remove {
-  cursor: pointer;
-  font-size: 10px;
-  padding-left: 4px;
-}
-.add-row {
-  cursor: pointer;
-  background: rgba(0,0,0,0.12);
-  border-radius: 4px;
-  padding-left: 10px;
-  padding-right: 10px;
-  border: none;
-  font-size: 18px;
-}
-.add-row:hover {
-  background: rgba(0,0,0,0.20);
-}
-.form input, .form textarea {
-  width: 400px;
-  padding: 10px;
-  border: 1px solid #e0dede;
-  outline: none;
-  font-size: 12px;
-}
-.form div {
-  margin: 5px 0;
-}
-.app_post_btn {
-  background: #4d7ef7;
-  color: #fff;
-  padding: 10px 80px;
-  text-transform: uppercase;
-  font-size: 12px;
-  font-weight: bold;
-  width: 520px;
-  border: none;
-  cursor: pointer;
-}
-.submitButton {
-  cursor: pointer;
-  color: #000;
-  display: block;
-  margin-top: 8px;
-  padding: 4px 10px;
-  background: rgba(0,0,0,0.12);
-  border: none;
-  border-radius: 4px;
-}
-.submitButton:hover {
-  background: rgba(0,0,0,0.20)
-}
-
+  .modall {
+    border-radius: 3px;
+    padding: 20px;
+    position: absolute;
+    z-index: 3000;
+    background: #fff;
+    margin-left: 20px;
+    -webkit-box-shadow: 0px 0px 6px 0px rgba(0,0,0,0.75);
+    -moz-box-shadow: 0px 0px 6px 0px rgba(0,0,0,0.75);
+    box-shadow: 0px 0px 6px 0px rgba(0,0,0,0.75);
+  }
+  .row.item {
+    border: 1px solid rgba(0,0,0,0.12);
+    border-radius: 5px;
+    background: rgba(0,0,0,0.02);
+    -webkit-box-shadow: inset 0px 0px 5px 0px rgba(0,0,0,0.12);
+    -moz-box-shadow: inset 0px 0px 5px 0px rgba(0,0,0,0.12);
+    box-shadow: inset 0px 0px 5px 0px rgba(0,0,0,0.12);
+  }
+  .closeButton {
+    color: #FFF;
+    float: right;
+    cursor: pointer;
+  }
+  .close {
+    position: absolute;
+    right: 19px;
+    top: 15px;
+    width: 26px;
+    height: 19px;
+    opacity: 0.3;
+  }
+  .close:hover {
+    opacity: 1;
+  }
+  .close:before, .close:after {
+    position: absolute;
+    left: 15px;
+    content: ' ';
+    height: 33px;
+    width: 2px;
+    background-color: #333;
+  }
+  .close:before {
+    transform: rotate(45deg);
+  }
+  .close:after {
+    transform: rotate(-45deg);
+  }
+  .multiselect__tags {
+    border: none !important;
+    background: none;
+  }
+  .multiselect__single {
+    background: none;
+  }
+  .bundle_wrap {
+    /* display: flex;
+    justify-content: center; */
+    text-align: center;
+  }
+  .bundle_table {
+    width: 80%;
+    margin: 0 auto;
+    margin: 5px;
+  }
+  .bundle_table td {
+    text-align: left;
+  }
+  /* .bundle_table tr,
+  .bundle_table td {
+    border: none;
+  } */
+  .bundle_title {
+    font-weight: bold;
+  }
+  .pieces {
+    background: none;
+    border: none;
+    border: none !important;
+    font-size: 15px !important;
+    padding-left: 14px !important;
+  }
+  .custom__tag {
+    padding: 5px;
+    background: rgba(0,0,0,0.12);
+    border-radius: 5px;
+    margin: 2px;
+  }
+  .custom__remove {
+    cursor: pointer;
+    font-size: 10px;
+    padding-left: 4px;
+  }
+  .add-row {
+    cursor: pointer;
+    background: rgba(0,0,0,0.12);
+    border-radius: 4px;
+    padding-left: 10px;
+    padding-right: 10px;
+    border: none;
+    font-size: 18px;
+  }
+  .add-row:hover {
+    background: rgba(0,0,0,0.20);
+  }
+  .form input, .form textarea {
+    width: 400px;
+    padding: 10px;
+    border: 1px solid #e0dede;
+    outline: none;
+    font-size: 12px;
+  }
+  .form div {
+    margin: 5px 0;
+  }
+  .app_post_btn {
+    background: #4d7ef7;
+    color: #fff;
+    padding: 10px 80px;
+    text-transform: uppercase;
+    font-size: 12px;
+    font-weight: bold;
+    width: 520px;
+    border: none;
+    cursor: pointer;
+  }
+  .submitButton {
+    cursor: pointer;
+    color: #000;
+    display: block;
+    margin-top: 8px;
+    padding: 4px 10px;
+    background: rgba(0,0,0,0.12);
+    border: none;
+    border-radius: 4px;
+  }
+  .submitButton:hover {
+    background: rgba(0,0,0,0.20)
+  }
 </style>
