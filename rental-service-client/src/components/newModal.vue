@@ -3,99 +3,96 @@
     <div class="close" @click="$parent.$emit('close')"></div>
     <h1>Bérlés felvétel</h1>
       <div class="form">
-        <div>
-          <input v-model="name" type="text" name="title" placeholder="Név">
-        </div>
-        <div>
-          <input v-model="phone" type="text" name="title" placeholder="Telefonszám">
-        </div>
-        <div>
-          <!--<textarea rows="15" cols="15" placeholder="DESCRIPTION"></textarea>-->
-        </div>
-        <div class="start">
-          Bérlés kezdete:<br>
           <div>
-            <date-picker class="startDate" v-model="startDate" :config="configs.start" placeholder="Dátum" name="start_date" ref="startDate"></date-picker>
+            <input v-model.trim="form.name" v-bind:class="{ error: !($v.form.name.required&&$v.form.name.minLength) }" type="text" name="title" placeholder="Név">
           </div>
           <div>
-            <date-picker class="startTime" v-model="startTime" :config="configs.timePicker" :wrap="true" placeholder="Idő" name="start_time" ref="endDate"></date-picker>
+            +<input v-model="form.phone" v-bind:class="{ error: !($v.form.phone.required&&$v.form.phone.minLength) }" type="text" name="title" placeholder="Telefonszám">
           </div>
-        </div>
-        <div class="end">
-          Bérlés Vége:<br>
-          <div>
-            <date-picker class="startDate" v-model="endDate" :config="configs.end" placeholder="Dátum" name="end_date" ref="endDate"></date-picker>
-          </div>
-          <div>
-            <date-picker class="endTime" v-model="endTime" :config="configs.timePicker" :wrap="true" placeholder="Idő" name="end_time" ref="endDate"></date-picker>
-          </div>
-        </div>
-
-        <label>Tétel hozzáadás</label>
-        <div class="row item" v-for="item in items">
-          <div class="form-element">
+          <div class="start">
+            Bérlés kezdete:<br>
             <div>
-              <multiselect v-model="item.type" :options="productOptions" :searchable="false" :close-on-select="true" :show-labels="false" placeholder="Termék típus"></multiselect>
+              <date-picker class="startDate" v-bind:class="{ error: !($v.form.startDate.required&&$v.form.startDate.minValue) }" v-model="form.startDate" :config="configs.start" placeholder="Dátum" name="start_date" ref="startDate"></date-picker>
             </div>
             <div>
-              <multiselect v-show="item.type == 'Fényformáló'" v-model="item.product" :options="lightshapers" :close-on-select="true" :clear-on-select="false" :hide-selected="true" :preserve-search="true" placeholder="Válassz fényformálót" label="name" track-by="name" :preselect-first="false">
-                <template slot="tag" slot-scope="props"><span class="custom__tag"><span>{{ props.option.value }}</span><span class="custom__remove" @click="props.remove(props.option)">❌</span></span></template>
-              </multiselect>
-              <multiselect v-show="item.type == 'Termék'" v-model="item.product" :options="products" :close-on-select="true" :clear-on-select="false" :hide-selected="true" :preserve-search="true" placeholder="Válassz Terméket" label="name" track-by="name" :preselect-first="false">
-                <template slot="tag" slot-scope="props"><span class="custom__tag"><span>{{ props.option.value }}</span><span class="custom__remove" @click="props.remove(props.option)">❌</span></span></template>
-              </multiselect>
-              <multiselect v-show="item.type == 'Szett'" v-model="item.bundle" :options="bundles" :close-on-select="true" :clear-on-select="false" :hide-selected="true" :preserve-search="true" placeholder="Válassz Szettet" label="name" track-by="name" :preselect-first="false">
-                <template slot="tag" slot-scope="props"><span class="custom__tag"><span>{{ props.option.value }}</span><span class="custom__remove" @click="props.remove(props.option)">❌</span></span></template>
-              </multiselect>
-              <div v-if="item.bundle" v-show="item.type == 'Szett'" class="bundle_wrap">
-                <div style="display: flex;justify-content: center">
-                <table class="bundle_table">
-                  <h6 class="bundle_title">Szett tartalma</h6>
-                  <tr v-for="m in item.bundle.items" >
-                    <td>{{ m.name }}</td>
-                    <td>{{ m.quantity }} db</td>
-                  </tr>
-                </table>
-                </div>
-                <div v-show="item.type == 'Szett'&&item.bundle.add_light">
-                  <h6 class="bundle_title">+ fényformáló</h6>
-                  <multiselect
-                    v-model="item.bundle.lightshaper1"
-                    :options="lightshapers"
-                    :close-on-select="true"
-                    :clear-on-select="false"
-                    :hide-selected="true"
-                    :preserve-search="true"
-                    placeholder="Fényformáló 1"
-                    label="name" track-by="name"
-                    :preselect-first="false">
-                    <template slot="tag" slot-scope="props"><span class="custom__tag"><span>{{ props.option.value }}</span><span class="custom__remove" @click="props.remove(props.option)">❌</span></span></template>
-                  </multiselect>
-                </div>
-                <div v-show="item.type == 'Szett'&&item.bundle.add_light">
-                  <h6 class="bundle_title">+ fényformáló</h6>
-                  <multiselect
-                    v-model="item.bundle.lightshaper2"
-                    :options="lightshapers"
-                    :close-on-select="true"
-                    :clear-on-select="false"
-                    :hide-selected="true"
-                    :preserve-search="true"
-                    placeholder="Fényformáló 2"
-                    label="name" track-by="name"
-                    :preselect-first="false">
-                    <template slot="tag" slot-scope="props"><span class="custom__tag"><span>{{ props.option.value }}</span><span class="custom__remove" @click="props.remove(props.option)">❌</span></span></template>
-                  </multiselect>
-                </div>
+              <date-picker class="startTime" v-bind:class="{ error: !$v.form.startTime.required }" v-model="form.startTime" :config="configs.timePicker" :wrap="true" placeholder="Idő" name="start_time" ref="endDate"></date-picker>
+            </div>
+          </div>
+          <div class="end">
+            Bérlés Vége:<br>
+            <div>
+              <date-picker class="startDate" v-bind:class="{ error: !$v.form.endDate.required }" v-model="form.endDate" :config="configs.end" placeholder="Dátum" name="end_date" ref="endDate"></date-picker>
+            </div>
+            <div>
+              <date-picker class="endTime" v-bind:class="{ error: !$v.form.endTime.required }" v-model="form.endTime" :config="configs.timePicker" :wrap="true" placeholder="Idő" name="end_time" ref="endDate"></date-picker>
+            </div>
+          </div>
+
+          <label>Tétel hozzáadás</label>
+          <div class="row item" v-for="item in items">
+            <div class="form-element">
+              <div>
+                <multiselect v-model="item.type" :options="productOptions" :searchable="false" :close-on-select="true" :show-labels="false" placeholder="Termék típus"></multiselect>
               </div>
               <div>
-                <input class="pieces" v-model="item.quantity" type="text" name="title" placeholder="Darab">
+                <multiselect v-show="item.type == 'Fényformáló'" v-model="item.product" :options="lightshapers" :close-on-select="true" :clear-on-select="false" :hide-selected="true" :preserve-search="true" placeholder="Válassz fényformálót" label="name" track-by="name" :preselect-first="false">
+                  <template slot="tag" slot-scope="props"><span class="custom__tag"><span>{{ props.option.value }}</span><span class="custom__remove" @click="props.remove(props.option)">❌</span></span></template>
+                </multiselect>
+                <multiselect v-show="item.type == 'Termék'" v-model="item.product" :options="products" :close-on-select="true" :clear-on-select="false" :hide-selected="true" :preserve-search="true" placeholder="Válassz Terméket" label="name" track-by="name" :preselect-first="false">
+                  <template slot="tag" slot-scope="props"><span class="custom__tag"><span>{{ props.option.value }}</span><span class="custom__remove" @click="props.remove(props.option)">❌</span></span></template>
+                </multiselect>
+                <multiselect v-show="item.type == 'Szett'" v-model="item.bundle" :options="bundles" :close-on-select="true" :clear-on-select="false" :hide-selected="true" :preserve-search="true" placeholder="Válassz Szettet" label="name" track-by="name" :preselect-first="false">
+                  <template slot="tag" slot-scope="props"><span class="custom__tag"><span>{{ props.option.value }}</span><span class="custom__remove" @click="props.remove(props.option)">❌</span></span></template>
+                </multiselect>
+                <div v-if="item.bundle" v-show="item.type == 'Szett'" class="bundle_wrap">
+                  <div style="display: flex;justify-content: center">
+                  <table class="bundle_table">
+                    <h6 class="bundle_title">Szett tartalma</h6>
+                    <tr v-for="m in item.bundle.items" >
+                      <td>{{ m.name }}</td>
+                      <td>{{ m.quantity }} db</td>
+                    </tr>
+                  </table>
+                  </div>
+                  <div v-show="item.type == 'Szett'&&item.bundle.add_light">
+                    <h6 class="bundle_title">+ fényformáló</h6>
+                    <multiselect
+                      v-model="item.bundle.lightshaper1"
+                      :options="lightshapers"
+                      :close-on-select="true"
+                      :clear-on-select="false"
+                      :hide-selected="true"
+                      :preserve-search="true"
+                      placeholder="Fényformáló 1"
+                      label="name" track-by="name"
+                      :preselect-first="false">
+                      <template slot="tag" slot-scope="props"><span class="custom__tag"><span>{{ props.option.value }}</span><span class="custom__remove" @click="props.remove(props.option)">❌</span></span></template>
+                    </multiselect>
+                  </div>
+                  <div v-show="item.type == 'Szett'&&item.bundle.add_light">
+                    <h6 class="bundle_title">+ fényformáló</h6>
+                    <multiselect
+                      v-model="item.bundle.lightshaper2"
+                      :options="lightshapers"
+                      :close-on-select="true"
+                      :clear-on-select="false"
+                      :hide-selected="true"
+                      :preserve-search="true"
+                      placeholder="Fényformáló 2"
+                      label="name" track-by="name"
+                      :preselect-first="false">
+                      <template slot="tag" slot-scope="props"><span class="custom__tag"><span>{{ props.option.value }}</span><span class="custom__remove" @click="props.remove(props.option)">❌</span></span></template>
+                    </multiselect>
+                  </div>
+                </div>
+                <div>
+                  <input class="pieces" v-model="item.quantity" type="text" name="title" placeholder="Darab">
+                </div>
               </div>
             </div>
           </div>
-        </div>
-        <button class="add-row" @click="addItemsRow">+</button>
-        <button class="submitButton" @click="submitForm()" type="submit" name="button">Elküld</button>
+          <button class="add-row" @click="addItemsRow">+</button>
+          <button class="submitButton" @click="submitForm()" :disabled="$v.form.$invalid" type="submit" name="button">Elküld</button>
       </div>
   </div>
 </template>
@@ -104,16 +101,20 @@
 import Multiselect from 'vue-multiselect'
 import { store } from '../store/store'
 import RentalService from '../services/RentalService'
+// import { required, minLength, between } from 'vuelidate/lib/validators'
+import { required, minLength } from 'vuelidate/lib/validators'
 
 export default {
   data () {
     return {
-      name: '',
-      phone: '',
-      startDate: null,
-      endDate: null,
-      startTime: null,
-      endTime: null,
+      form: {
+        name: '',
+        phone: '',
+        startDate: null,
+        endDate: null,
+        startTime: null,
+        endTime: null
+      },
       items: [],
       lightshapers: [],
       products: [],
@@ -140,6 +141,32 @@ export default {
           showClear: true,
           showClose: true
         }
+      }
+    }
+  },
+  validations: {
+    form: {
+      name: {
+        required,
+        minLength: minLength(4)
+      },
+      phone: {
+        required,
+        minLength: minLength(11)
+      },
+      startDate: {
+        required,
+        minValue: value => value >= new Date().toISOString()
+      },
+      startTime: {
+        required
+      },
+      endDate: {
+        required,
+        minValue: value => value >= new Date().toISOString()
+      },
+      endTime: {
+        required
       }
     }
   },
@@ -198,21 +225,21 @@ export default {
       }
       // console.log(arr)
       let data = {
-        'user_name': this.name,
-        'rent_start': this.startDate,
-        'rent_end': this.endDate,
+        'user_name': this.form.name,
+        'rent_start': this.form.startDate,
+        'rent_end': this.form.endDate,
         'rent_register': 'Kati',
-        'user_phone': this.phone,
+        'user_phone': this.form.phone,
         'items': arr
       }
       RentalService.addRental(data).then(result => {
         if (result.status === 200) {
-          this.name = ''
-          this.phone = ''
-          this.startDate = ''
-          this.startTime = ''
-          this.endDate = ''
-          this.endTime = ''
+          this.form.name = ''
+          this.form.phone = ''
+          this.form.startDate = ''
+          this.form.startTime = ''
+          this.form.endDate = ''
+          this.form.endTime = ''
           this.$parent.$emit('close')
           store.commit('setBackToDefault')
           store.commit('refresh')
@@ -338,6 +365,7 @@ export default {
     width: 400px;
     padding: 10px;
     border: 1px solid #e0dede;
+    border-radius: 0.25rem;
     outline: none;
     font-size: 12px;
   }
@@ -367,5 +395,8 @@ export default {
   }
   .submitButton:hover {
     background: rgba(0,0,0,0.20)
+  }
+  .error {
+    border-color: rgb(234,25,32, 0.2) !important;
   }
 </style>
